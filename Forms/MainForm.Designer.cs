@@ -94,6 +94,8 @@ namespace Aist
             this.saveButton = new System.Windows.Forms.Button();
             this.ToolBar = new System.Windows.Forms.Panel();
             this.panel6 = new System.Windows.Forms.Panel();
+            this.saveLabel = new System.Windows.Forms.Label();
+            this.saveProgressBar = new System.Windows.Forms.ProgressBar();
             this.consultationIntNumLabel = new System.Windows.Forms.Label();
             this.consultationsNumLabel = new System.Windows.Forms.Label();
             this.scheduleFlowLayoutPanel.SuspendLayout();
@@ -644,6 +646,8 @@ namespace Aist
             // 
             // panel6
             // 
+            this.panel6.Controls.Add(this.saveLabel);
+            this.panel6.Controls.Add(this.saveProgressBar);
             this.panel6.Controls.Add(this.consultationIntNumLabel);
             this.panel6.Controls.Add(this.consultationsNumLabel);
             this.panel6.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -651,6 +655,23 @@ namespace Aist
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(1904, 30);
             this.panel6.TabIndex = 7;
+            // 
+            // saveLabel
+            // 
+            this.saveLabel.AutoSize = true;
+            this.saveLabel.Location = new System.Drawing.Point(1664, 7);
+            this.saveLabel.Name = "saveLabel";
+            this.saveLabel.Size = new System.Drawing.Size(74, 15);
+            this.saveLabel.TabIndex = 4;
+            this.saveLabel.Text = "Сохранение";
+            // 
+            // saveProgressBar
+            // 
+            this.saveProgressBar.ForeColor = System.Drawing.Color.Blue;
+            this.saveProgressBar.Location = new System.Drawing.Point(1743, 3);
+            this.saveProgressBar.Name = "saveProgressBar";
+            this.saveProgressBar.Size = new System.Drawing.Size(149, 23);
+            this.saveProgressBar.TabIndex = 3;
             // 
             // consultationIntNumLabel
             // 
@@ -677,6 +698,7 @@ namespace Aist
             this.Controls.Add(this.ToolBarFlowLayoutPanel);
             this.Controls.Add(this.scheduleFlowLayoutPanel);
             this.Controls.Add(this.ToolBar);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(1918, 1030);
             this.Name = "MainForm";
@@ -701,6 +723,7 @@ namespace Aist
             this.datePanel.ResumeLayout(false);
             this.ToolBarFlowLayoutPanel.ResumeLayout(false);
             this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -761,5 +784,7 @@ namespace Aist
         private Panel panel6;
         private Label consultationIntNumLabel;
         private Label consultationsNumLabel;
+        private Label saveLabel;
+        private ProgressBar saveProgressBar;
     }
 }

@@ -12,6 +12,7 @@ namespace Aist
 {
     public partial class SaveForm : Form
     {
+        public bool flag = false;
         public SaveForm()
         {
             InitializeComponent();
@@ -19,6 +20,7 @@ namespace Aist
 
         private void saveButton_Click(object sender, EventArgs e)
         {
+            flag = true;
             this.Hide();
         }
 
@@ -27,7 +29,7 @@ namespace Aist
             if(consultationsNum == 0)
             {
                 consultationsDocCheckBox.Enabled = false;
-                consultationsJsonBheckBox.Enabled = false;
+                consultationsJsonCheckBox.Enabled = false;
             }
         }
     }

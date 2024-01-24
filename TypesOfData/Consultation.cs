@@ -40,7 +40,6 @@ namespace Aist.TypesOfData
                 });
 
             File.WriteAllText(filePath, serializedelements);
-            MessageBox.Show($"Сохранено в файл: {fileName}");
         }
     }
 }

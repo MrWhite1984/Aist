@@ -14,6 +14,7 @@ using Aist.TypesOfData;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Word;
 using Application = Microsoft.Office.Interop.Excel.Application;
+using Task = System.Threading.Tasks.Task;
 
 namespace Aist
 {
@@ -244,7 +245,7 @@ namespace Aist
             consultationIntNumLabel.Text = consultations.Count.ToString();
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
+        private async void saveButton_Click(object sender, EventArgs e)
         {
             if (firstFileData.Count != 0)
             {
@@ -252,60 +253,46 @@ namespace Aist
                 saveForm.consultationsNum = consultations.Count;
                 saveForm.ShowDialog();
                 string pathToNewFile = "0";
-                if (((saveForm.scheduleCheckBox.Checked || saveForm.consultationsDocCheckBox.Checked) || (saveForm.consultationsJsonBheckBox.Checked && Settings.ImportSettings().JsonSaveLocationRadioButton == 0)))
+                if (saveForm.flag)
                 {
-                    folderBrowserDialog.ShowDialog();
-                    pathToNewFile = folderBrowserDialog.SelectedPath;
-                }
-                if (pathToNewFile != "" && pathToNewFile != null)
-                {
-                    if (firstFileData.Count != 0 && consultations.Count != 0 && saveForm.scheduleCheckBox.Checked)
+                    if (((saveForm.scheduleCheckBox.Checked || saveForm.consultationsDocCheckBox.Checked) || (saveForm.consultationsJsonCheckBox.Checked && Settings.ImportSettings().JsonSaveLocationRadioButton == 0)))
                     {
-                        List<Consultation> temporaryListOfConsultations = new List<Consultation>();
-                        temporaryListOfConsultations.AddRange(consultations);
-                        Dictionary<int, string> temporaryDictionaryOfDays = new Dictionary<int, string>();
-                        for (int i = 0; i < days.Count; i++)
-                        {
-                            temporaryDictionaryOfDays.Add(days.Keys.ToList()[i], days.Values.ToList()[i]);
-                        }
-                        List<List<string[]>> temporaryListOfFirstFileData = new List<List<string[]>>();
-                        temporaryListOfFirstFileData.AddRange(firstFileData);
-                        DataWriter.SavingDataInScheduleFormat(pathToNewFile, temporaryListOfConsultations, temporaryDictionaryOfDays, FLPClear, temporaryListOfFirstFileData);
+                        folderBrowserDialog.ShowDialog();
+                        pathToNewFile = folderBrowserDialog.SelectedPath;
                     }
-                    if (consultations.Count > 0)
+                    List<System.Windows.Forms.CheckBox> saveFormats = new List<System.Windows.Forms.CheckBox>() { saveForm.scheduleCheckBox, saveForm.consultationsDocCheckBox, saveForm.consultationsJsonCheckBox };
+                    if (pathToNewFile != "" && pathToNewFile != null)
                     {
-                        if (saveForm.consultationsDocCheckBox.Checked)
-                        {
-                            List<Consultation> temporaryListOfConsultations = new List<Consultation>();
-                            temporaryListOfConsultations.AddRange(consultations);
-                            Dictionary<int, string> temporaryDictionaryOfDays = new Dictionary<int, string>();
-                            for (int i = 0; i < days.Count; i++)
-                            {
-                                temporaryDictionaryOfDays.Add(days.Keys.ToList()[i], days.Values.ToList()[i]);
-                            }
-                            DataWriter.WriteConsultationsToFile(pathToNewFile, temporaryListOfConsultations, temporaryDictionaryOfDays, FLPClear);
-                        }
-                        Settings settings = Settings.ImportSettings();
-                        if (settings.JsonSaveLocationRadioButton == 1 && settings.JsonPathString != "" && saveForm.consultationsJsonBheckBox.Checked)
-                        {
-                            ConsultationForJSON.WriteToJSON(settings.JsonPathString, $@"{teacher}.json", new ConsultationForJSON(teacher, consultations));
-                        }
-                        else if (saveForm.consultationsJsonBheckBox.Checked)
-                        {
-                            ConsultationForJSON.WriteToJSON(pathToNewFile, $@"{teacher}.json", new ConsultationForJSON(teacher, consultations));
-                        }
+                        DataSaver.progressBar = saveProgressBar;
+                        DataSaver.SaveDataToFiles
+                            (
+                            firstFileData,
+                            consultations,
+                            saveForm,
+                            days,
+                            pathToNewFile,
+                            //FLPClear,
+                            teacher,
+                            saveFormats.Count(box => box.Checked)
+                            );
                     }
+                    else
+                    {
+                        MessageBox.Show("Введите путь");
+                    }
+                    saveForm.Close();
+                    saveForm.Dispose();
                 }
-                else
-                {
-                    MessageBox.Show("Введите путь");
-                }
-                saveForm.Close();
             }
             else
             {
                 MessageBox.Show("Нет открытого расписания");
             }
+        }
+
+        private void OnProgressBarChange(int progress)
+        {
+            saveProgressBar.Value += progress;
         }
 
         private void FLPClear()

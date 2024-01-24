@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.consultationsDocCheckBox = new System.Windows.Forms.CheckBox();
-            this.consultationsJsonBheckBox = new System.Windows.Forms.CheckBox();
+            this.consultationsJsonCheckBox = new System.Windows.Forms.CheckBox();
             this.scheduleCheckBox = new System.Windows.Forms.CheckBox();
             this.saveButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -46,13 +46,13 @@
             // 
             // consultationsJsonBheckBox
             // 
-            this.consultationsJsonBheckBox.AutoSize = true;
-            this.consultationsJsonBheckBox.Location = new System.Drawing.Point(12, 37);
-            this.consultationsJsonBheckBox.Name = "consultationsJsonBheckBox";
-            this.consultationsJsonBheckBox.Size = new System.Drawing.Size(201, 19);
-            this.consultationsJsonBheckBox.TabIndex = 1;
-            this.consultationsJsonBheckBox.Text = "Сохранить \"Консультации.json\"";
-            this.consultationsJsonBheckBox.UseVisualStyleBackColor = true;
+            this.consultationsJsonCheckBox.AutoSize = true;
+            this.consultationsJsonCheckBox.Location = new System.Drawing.Point(12, 37);
+            this.consultationsJsonCheckBox.Name = "consultationsJsonBheckBox";
+            this.consultationsJsonCheckBox.Size = new System.Drawing.Size(201, 19);
+            this.consultationsJsonCheckBox.TabIndex = 1;
+            this.consultationsJsonCheckBox.Text = "Сохранить \"Консультации.json\"";
+            this.consultationsJsonCheckBox.UseVisualStyleBackColor = true;
             // 
             // scheduleCheckBox
             // 
@@ -81,7 +81,7 @@
             this.ClientSize = new System.Drawing.Size(223, 122);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.scheduleCheckBox);
-            this.Controls.Add(this.consultationsJsonBheckBox);
+            this.Controls.Add(this.consultationsJsonCheckBox);
             this.Controls.Add(this.consultationsDocCheckBox);
             this.Name = "SaveForm";
             this.ShowIcon = false;
@@ -96,7 +96,7 @@
         #endregion
 
         public CheckBox consultationsDocCheckBox;
-        public CheckBox consultationsJsonBheckBox;
+        public CheckBox consultationsJsonCheckBox;
         public CheckBox scheduleCheckBox;
         private Button saveButton;
     }
