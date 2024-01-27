@@ -19,13 +19,9 @@ namespace Aist
         public static ProgressBar progressBar;
 
         public delegate void ProgressHandler(int progress);
-        public static event ProgressHandler? Notify;
-
-        public event Action<int> ProgressChanged;
 
         static List<List<string[]>> FirstFileData;
         static List<Consultation> Consultations;
-        static SaveForm SaveForm;
         static Dictionary<int, string> Days;
         static string PathToNewFile;
         static string Teacher;
@@ -33,10 +29,6 @@ namespace Aist
         static Settings settings;
         static int RemainingWorkCounter;
 
-        private static void OnProgressChanged(int progress)
-        {
-            progressBar.Value += progress;
-        }
 
         public static void SaveDataToFiles
             (
@@ -51,7 +43,6 @@ namespace Aist
         {
             FirstFileData = firstFileData;
             Consultations = consultations;
-            SaveForm = saveForm;
             Days = days;
             PathToNewFile = pathToNewFile;
             Teacher = teacher;
@@ -78,7 +69,7 @@ namespace Aist
             backgroundWorker3_2.RunWorkerCompleted += new RunWorkerCompletedEventHandler(BackgroundWorker3_2_RunWorkerCompleted);
 
 
-            if (firstFileData.Count != 0 && consultations.Count != 0 && saveForm.scheduleCheckBox.Checked)
+            if (firstFileData != null && firstFileData.Count != 0 && consultations.Count != 0 && saveForm.scheduleCheckBox.Checked)
             {
                 backgroundWorker1.RunWorkerAsync();
             }
@@ -101,45 +92,50 @@ namespace Aist
             
         }
 
+        readonly static int[] completionPercenrage = { 100, 50, 33, 34, 0};
+
         private static void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            List<Consultation> temporaryListOfConsultations = new List<Consultation>();
+            List<Consultation> temporaryListOfConsultations = new ();
             temporaryListOfConsultations.AddRange(Consultations);
-            Dictionary<int, string> temporaryDictionaryOfDays = new Dictionary<int, string>();
+            Dictionary<int, string> temporaryDictionaryOfDays = new ();
             for (int i = 0; i < Days.Count; i++)
             {
                 temporaryDictionaryOfDays.Add(Days.Keys.ToList()[i], Days.Values.ToList()[i]);
             }
-            List<List<string[]>> temporaryListOfFirstFileData = new List<List<string[]>>();
-            temporaryListOfFirstFileData.AddRange(FirstFileData);
+            List<List<string[]>> temporaryListOfFirstFileData = new ();
+            if(FirstFileData != null)
+            {
+                temporaryListOfFirstFileData.AddRange(FirstFileData);
+            }
             DataWriter.SavingDataInScheduleFormat(PathToNewFile, temporaryListOfConsultations, temporaryDictionaryOfDays, temporaryListOfFirstFileData);
             RemainingWorkCounter--;
             if (CheckedNum == 1)
             {
-                e.Result = 100;
+                e.Result = completionPercenrage[0];
             }
             else if (CheckedNum == 2)
-                e.Result = 50;
+                e.Result = completionPercenrage[1];
             else
-                e.Result = 33;
+                e.Result = completionPercenrage[2];
         }
         private static void BackgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             progressBar.Value += Convert.ToInt32(e.Result.ToString());
-            if (progressBar.Value == 100)
+            if (progressBar.Value == completionPercenrage[0])
             {
                 DialogResult dialogResult = MessageBox.Show("Файлы сохранены", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if(dialogResult == DialogResult.OK)
-                    progressBar.Value = 0;
+                    progressBar.Value = completionPercenrage[4];
             }
         }
 
 
         private static void BackgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
-            List<Consultation> temporaryListOfConsultations = new List<Consultation>();
+            List<Consultation> temporaryListOfConsultations = new();
             temporaryListOfConsultations.AddRange(Consultations);
-            Dictionary<int, string> temporaryDictionaryOfDays = new Dictionary<int, string>();
+            Dictionary<int, string> temporaryDictionaryOfDays = new();
             for (int i = 0; i < Days.Count; i++)
             {
                 temporaryDictionaryOfDays.Add(Days.Keys.ToList()[i], Days.Values.ToList()[i]);
@@ -148,21 +144,21 @@ namespace Aist
             RemainingWorkCounter--;
             if (CheckedNum == 1)
             {
-                e.Result = 100;
+                e.Result = completionPercenrage[0];
             }                
             else if (CheckedNum == 2)
-                e.Result = 50;
+                e.Result = completionPercenrage[1];
             else
-                e.Result = 33;
+                e.Result = completionPercenrage[2];
         }
         private static void BackgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             progressBar.Value += Convert.ToInt32(e.Result.ToString());
-            if (progressBar.Value == 100)
+            if (progressBar.Value == completionPercenrage[0])
             {
                 DialogResult dialogResult = MessageBox.Show("Файлы сохранены", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if (dialogResult == DialogResult.OK)
-                    progressBar.Value = 0;
+                    progressBar.Value = completionPercenrage[4];
             }
         }
 
@@ -172,20 +168,20 @@ namespace Aist
             ConsultationForJSON.WriteToJSON(settings.JsonPathString, $@"{Teacher}.json", new ConsultationForJSON(Teacher, Consultations));
             RemainingWorkCounter--;
             if (CheckedNum == 1)
-                e.Result = 100;
+                e.Result = completionPercenrage[0];
             else if (CheckedNum == 2)
-                e.Result = 50;
+                e.Result = completionPercenrage[1];
             else
-                e.Result = 34;
+                e.Result = completionPercenrage[3];
         }
         private static void BackgroundWorker3_1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             progressBar.Value += Convert.ToInt32(e.Result.ToString());
-            if (progressBar.Value == 100)
+            if (progressBar.Value == completionPercenrage[0])
             {
                 DialogResult dialogResult = MessageBox.Show("Файлы сохранены", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if (dialogResult == DialogResult.OK)
-                    progressBar.Value = 0;
+                    progressBar.Value = completionPercenrage[4];
             }
         }
 
@@ -194,20 +190,20 @@ namespace Aist
             ConsultationForJSON.WriteToJSON(PathToNewFile, $@"{Teacher}.json", new ConsultationForJSON(Teacher, Consultations));
             RemainingWorkCounter--;
             if (CheckedNum == 1)
-                e.Result = 100;
+                e.Result = completionPercenrage[0];
             else if (CheckedNum == 2)
-                e.Result = 50;
+                e.Result = completionPercenrage[1];
             else
-                e.Result = 34;
+                e.Result = completionPercenrage[3];
         }
         private static void BackgroundWorker3_2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             progressBar.Value += Convert.ToInt32(e.Result.ToString());
-            if (progressBar.Value == 100)
+            if (progressBar.Value == completionPercenrage[0])
             {
                 DialogResult dialogResult = MessageBox.Show("Файлы сохранены", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if (dialogResult == DialogResult.OK)
-                    progressBar.Value = 0;
+                    progressBar.Value = completionPercenrage[4];
             }
         }
     }

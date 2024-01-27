@@ -13,21 +13,23 @@ namespace Aist
 {
     class DataReader
     {
-        static Dictionary<int, string> daysOfTheWeek = new Dictionary<int, string>() { { 0, "пнд" }, { 1, "втр" }, { 2, "срд" }, { 3, "чтв" }, { 4, "птн" }, { 5, "сбт" }, { 6, "вск" } };
+        readonly static string[] typesOfPair = { "л.", "лаб.", "пр.", "экз.", "зач." };
+        readonly static Dictionary<int, string> daysOfTheWeek = new () { { 0, "пнд" }, { 1, "втр" }, { 2, "срд" }, { 3, "чтв" }, { 4, "птн" }, { 5, "сбт" }, { 6, "вск" } };
+
         public static List<string[]> ReadAllData(Worksheet ws)
         {
             int i = 7;
-            List<string[]> data = new List<string[]>();
+            List<string[]> data = new();
             while (ws.Cells[i, 8].Value != null)
             {
-                string s1 = ws.Cells[i, 1].Value;
-                string s2 = ws.Cells[i, 3].Value;
-                string s3 = ws.Cells[i, 8].Value;
-                string s4 = ws.Cells[i, 9].Value;
-                string s5 = ws.Cells[i, 10].Value;
-                string s6 = ws.Cells[i, 11].Value;
-                string s7 = ws.Cells[i, 13].Value;
-                string[] row = { s1, s2, s3, s4, s5, s6, s7 };
+                string typeOfPair = ws.Cells[i, 1].Value;
+                string nameOfPair = ws.Cells[i, 3].Value;
+                string dateOfPair = ws.Cells[i, 8].Value;
+                string dayOfPair = ws.Cells[i, 9].Value;
+                string numberOfPair = ws.Cells[i, 10].Value;
+                string roomOfPair = ws.Cells[i, 11].Value;
+                string groupOfPair = ws.Cells[i, 13].Value;
+                string[] row = { typeOfPair, nameOfPair, dateOfPair, dayOfPair, numberOfPair, roomOfPair, groupOfPair };
                 data.Add(row);
                 i++;
             }
@@ -35,8 +37,8 @@ namespace Aist
         }
         public static List<List<string[]>> DataByDays(List<string[]> ungroupedData)
         {
-            List<List<string[]>> data = new List<List<string[]>>();
-            List<string[]> partOfData = new List<string[]>();
+            List<List<string[]>> data = new();
+            List<string[]> partOfData = new();
             for (int i = 0; i < ungroupedData.Count; i++)
             {
                 if (ungroupedData.Count != i+1)
@@ -45,7 +47,7 @@ namespace Aist
                     {
                         partOfData.Add(ungroupedData[i]);
                         data.Add(partOfData);
-                        partOfData = new List<string[]>();
+                        partOfData = new();
                     }
                     else
                     {
@@ -81,7 +83,7 @@ namespace Aist
         }
         public static Dictionary<int, string> GetDateByCode(List<List<string[]>> data)
         {
-            Dictionary<int, string> date = new Dictionary<int, string>();
+            Dictionary<int, string> date = new();
             for (int i = 0; i < data.Count; i++)
             {
                 date.Add(i, data[i][0][2]);
@@ -91,9 +93,9 @@ namespace Aist
 
         public static (List<List<string[]>>, string, string) GetDataFromTxt(string filePath)
         {
-            List<string[]> data = new List<string[]>();
+            List<string[]> data = new();
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-            StreamReader reader = new StreamReader(filePath, Encoding.GetEncoding("WINDOWS-1251"));
+            StreamReader reader = new(filePath, Encoding.GetEncoding("WINDOWS-1251"));
             var dataFromTxt1251 = File.ReadAllLines(filePath);
             string[] dataFromTxt = new string[dataFromTxt1251.Length];
             for (int i = 0; i < dataFromTxt1251.Length; i++)
@@ -115,7 +117,7 @@ namespace Aist
                             var chunks = dataFromTxt[i].Split('¦', StringSplitOptions.RemoveEmptyEntries)[j].Split(' ', StringSplitOptions.RemoveEmptyEntries);
                             if (chunks.Length > 1)
                             {
-                                if (chunks[0] == "л." | chunks[0] == "лаб." | chunks[0] == "пр." | chunks[0] == "экз." | chunks[0] == "зач.")
+                                if (chunks[0] == typesOfPair[0] | chunks[0] == typesOfPair[1] | chunks[0] == typesOfPair[2] | chunks[0] == typesOfPair[3] | chunks[0] == typesOfPair[4])
                                 {
                                     s[0] = chunks[0];
                                     j++;
@@ -161,14 +163,14 @@ namespace Aist
 
         public static List<List<string[]>> MergeData(List<List<string[]>> data1, List<List<string[]>> data2)
         {
-            List<List<string[]>> ungroupedDataInDayFormat = new List<List<string[]>>();
-            List<List<string[]>> dataForReturn = new List<List<string[]>>();
-            List<string[]> ungroupedData = new List<string[]>();
-            List<string[]> dataToByDays = new List<string[]>();
-            List<List<string[]>> data = new List<List<string[]>>();
+            List<List<string[]>> ungroupedDataInDayFormat = new();
+            List<List<string[]>> dataForReturn = new();
+            List<string[]> ungroupedData = new();
+            List<string[]> dataToByDays = new();
+            List<List<string[]>> data = new();
             ungroupedDataInDayFormat.AddRange(data1);
             ungroupedDataInDayFormat.AddRange(data2);
-            List<DateTime> date = new List<DateTime>();
+            List<DateTime> date = new();
             foreach (var item in ungroupedDataInDayFormat)
             {
                 foreach(var partOfItem in item)
@@ -184,7 +186,7 @@ namespace Aist
                 }
                 date.Sort();
             }
-            List<string> dateString = new List<string>();
+            List<string> dateString = new();
             foreach (var oneDate in date)
             {
                 dateString.Add(oneDate.ToString("dd/MM/yyyy").Remove(5));
@@ -202,8 +204,8 @@ namespace Aist
             data = DataByDays(dataToByDays);
             foreach (var partOfData in data)
             {
-                Dictionary<int, string[]> subjects = new Dictionary<int, string[]>();
-                List<string[]> day = new List<string[]>();
+                Dictionary<int, string[]> subjects = new();
+                List<string[]> day = new();
                 foreach (var partOfData2 in partOfData)
                 {
                     switch (partOfData2[4])
@@ -249,13 +251,12 @@ namespace Aist
 
         public static List<List<string[]>> ConvertToWeeklyFormat(List<List<string[]>> data)
         {
-            List<List<string[]>> dataInWeeklyFormat = new List<List<string[]>>();
-            List<List<string[]>> dataCopy = new List<List<string[]>>();
+            List<List<string[]>> dataInWeeklyFormat = new();
+            List<List<string[]>> dataCopy = new();
             dataCopy.AddRange(data);
-            int weekCounter = 0;
             while(data.Count != 0)
             {
-                List <List<string[]>> dataForRemove = new List<List<string[]>>();
+                List <List<string[]>> dataForRemove = new();
                 string[] weekDays = new string[7];
                 if (data[0][0][3] == "втp")
                 {
@@ -289,8 +290,10 @@ namespace Aist
                             }
                             if (!flag)
                             {
-                                List<string[]> dataDay = new List<string[]>();
-                                dataDay.Add(new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " });
+                                List<string[]> dataDay = new()
+                                {
+                                    new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " }
+                                };
                                 dataInWeeklyFormat.Add(dataDay);
                             }
                         }
@@ -317,8 +320,10 @@ namespace Aist
                             }
                             if (!flag)
                             {
-                                List<string[]> dataDay = new List<string[]>();
-                                dataDay.Add(new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " });
+                                List<string[]> dataDay = new()
+                                {
+                                    new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " }
+                                };
                                 dataInWeeklyFormat.Add(dataDay);
                             }
                         }
@@ -345,8 +350,10 @@ namespace Aist
                             }
                             if (!flag)
                             {
-                                List<string[]> dataDay = new List<string[]>();
-                                dataDay.Add(new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " });
+                                List<string[]> dataDay = new()
+                                {
+                                    new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " }
+                                };
                                 dataInWeeklyFormat.Add(dataDay);
                             }
                         }
@@ -373,8 +380,10 @@ namespace Aist
                             }
                             if (!flag)
                             {
-                                List<string[]> dataDay = new List<string[]>();
-                                dataDay.Add(new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " });
+                                List<string[]> dataDay = new()
+                                {
+                                    new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " }
+                                };
                                 dataInWeeklyFormat.Add(dataDay);
                             }
                         }
@@ -401,8 +410,10 @@ namespace Aist
                             }
                             if (!flag)
                             {
-                                List<string[]> dataDay = new List<string[]>();
-                                dataDay.Add(new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " });
+                                List<string[]> dataDay = new()
+                                {
+                                    new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " }
+                                };
                                 dataInWeeklyFormat.Add(dataDay);
                             }
                         }
@@ -429,8 +440,10 @@ namespace Aist
                             }
                             if (!flag)
                             {
-                                List<string[]> dataDay = new List<string[]>();
-                                dataDay.Add(new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " });
+                                List<string[]> dataDay = new()
+                                {
+                                    new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " }
+                                };
                                 dataInWeeklyFormat.Add(dataDay);
                             }
                         }
@@ -457,8 +470,10 @@ namespace Aist
                             }
                             if (!flag)
                             {
-                                List<string[]> dataDay = new List<string[]>();
-                                dataDay.Add(new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " });
+                                List<string[]> dataDay = new()
+                                {
+                                    new string[5] { "", "Выходной", weekDays[i], daysOfTheWeek[i], "08.20-09.50 " }
+                                };
                                 dataInWeeklyFormat.Add(dataDay);
                             }
                         }
@@ -473,7 +488,7 @@ namespace Aist
         }
         public static List<List<string[]>> ConvertToNormalFormat(List<List<string[]>> data, List<Consultation> consultations)
         {
-            List<string> consultationsDates = new List<string>();
+            List<string> consultationsDates = new();
             foreach (var consultation in consultations)
             {
                 if (!consultationsDates.Contains(consultation.Date))
@@ -481,7 +496,7 @@ namespace Aist
                     consultationsDates.Add(consultation.Date);
                 }
             }
-            List < List<string[]> > dataCopy = new List<List<string[]>>();
+            List < List<string[]> > dataCopy = new();
             dataCopy.AddRange(data);
             foreach (var partOfData in dataCopy)
             {

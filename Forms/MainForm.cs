@@ -20,7 +20,6 @@ namespace Aist
 {
     public partial class MainForm : Form
     {
-        int consultationNum = 0;
         public MainForm()
         {
             InitializeComponent();
@@ -29,10 +28,12 @@ namespace Aist
         {
             if (!File.Exists("Settings.json"))
             {
-                Settings settings = new Settings();
-                settings.JsonSaveLocationRadioButton = 0;
-                settings.JsonPathString = "";
-                settings.Format = 0;
+                Settings settings = new()
+                {
+                    JsonSaveLocationRadioButton = 0,
+                    JsonPathString = "",
+                    Format = 0
+                };
                 Settings.SetSettings(settings);
             }
         }
@@ -50,14 +51,14 @@ namespace Aist
             MainDelegateRefresh del = addConsultationButton_Click;
             MainDelegateDelete mainDelegateDelete = deleteButton_Click;
             MainDelegateClean mainDelegateClean = FLPClear;
-            List<List<string[]>> data = new List<List<string[]>>();
+            List<List<string[]>> data = new();
             Settings settings = Settings.ImportSettings();
             if (openFileDialog.FileName != "")
             {
                 path = openFileDialog.FileName;
                 if (path.IndexOf(".xls") != -1)
                 {
-                    Application excel = new Application();
+                    Application excel = new();
                     Workbook wb;
                     Worksheet ws;
 
@@ -128,10 +129,10 @@ namespace Aist
             if (openFileDialog.FileName != "")
             {
                 path = openFileDialog.FileName;
-                List<List<string[]>> newData = new List<List<string[]>>();
+                List<List<string[]>> newData = new();
                 if (path.IndexOf(".xls") != -1)
                 {
-                    Application excel = new Application();
+                    Application excel = new();
                     Workbook wb;
                     Worksheet ws;
 
@@ -166,9 +167,9 @@ namespace Aist
                 cards.Clear();
                 hashes.Hashes.Clear();
                 MainDelegateRefresh del = addConsultationButton_Click;
-                List<List<string[]>> firstData = new List<List<string[]>>();
+                List<List<string[]>> firstData = new();
                 firstData.AddRange(firstFileData);
-                List<List<string[]>> oldData = new List<List<string[]>>();
+                List<List<string[]>> oldData = new();
                 oldData.AddRange(firstFileData);
                 try
                 {
@@ -206,9 +207,9 @@ namespace Aist
         {
             MainDelegateRefresh del = addConsultationButton_Click;
             MainDelegateDelete mainDelegateDelete = deleteButton_Click;
-            AddConsultationForm addConsultationForm = new AddConsultationForm();
+            AddConsultationForm addConsultationForm = new();
             addConsultationForm.ShowDialog();
-            Consultation consultation = new Consultation()
+            Consultation consultation = new()
             {
                 Day = hashes.Hashes[Convert.ToInt32(sender.GetHashCode().ToString())].Item1,
                 SubjPos = hashes.Hashes[Convert.ToInt32(sender.GetHashCode().ToString())].Item2,
@@ -249,8 +250,10 @@ namespace Aist
         {
             if (firstFileData.Count != 0)
             {
-                SaveForm saveForm = new SaveForm();
-                saveForm.consultationsNum = consultations.Count;
+                SaveForm saveForm = new()
+                {
+                    consultationsNum = consultations.Count
+                };
                 saveForm.ShowDialog();
                 string pathToNewFile = "0";
                 if (saveForm.flag)
@@ -260,7 +263,7 @@ namespace Aist
                         folderBrowserDialog.ShowDialog();
                         pathToNewFile = folderBrowserDialog.SelectedPath;
                     }
-                    List<System.Windows.Forms.CheckBox> saveFormats = new List<System.Windows.Forms.CheckBox>() { saveForm.scheduleCheckBox, saveForm.consultationsDocCheckBox, saveForm.consultationsJsonCheckBox };
+                    List<System.Windows.Forms.CheckBox> saveFormats = new() { saveForm.scheduleCheckBox, saveForm.consultationsDocCheckBox, saveForm.consultationsJsonCheckBox };
                     if (pathToNewFile != "" && pathToNewFile != null)
                     {
                         DataSaver.progressBar = saveProgressBar;
@@ -302,8 +305,10 @@ namespace Aist
         private void settingsButton_Click(object sender, EventArgs e)
         {
             Settings settings = Settings.ImportSettings();
-            SettingsForm settingsForm = new SettingsForm();
-            settingsForm.consultations = consultations;
+            SettingsForm settingsForm = new()
+            {
+                consultations = consultations
+            };
             settingsForm.ShowDialog();
             Settings newSettings = Settings.ImportSettings();
             if (settings.Format != newSettings.Format)
@@ -314,7 +319,7 @@ namespace Aist
                     hashes.Hashes.Clear();
                     MainDelegateRefresh del = addConsultationButton_Click;
                     MainDelegateDelete mainDelegateDelete = deleteButton_Click;
-                    List<List<string[]>> firstData = new List<List<string[]>>();
+                    List<List<string[]>> firstData = new();
                     firstData.AddRange(firstFileData);
                     firstFileData.Clear();
                     firstFileData.AddRange(DataReader.ConvertToWeeklyFormat(firstData));
@@ -332,7 +337,7 @@ namespace Aist
                     hashes.Hashes.Clear();
                     MainDelegateRefresh del = addConsultationButton_Click;
                     MainDelegateDelete mainDelegateDelete = deleteButton_Click;
-                    List<List<string[]>> firstData = new List<List<string[]>>();
+                    List<List<string[]>> firstData = new();
                     firstData.AddRange(firstFileData);
                     firstFileData.Clear();
                     firstFileData.AddRange(DataReader.ConvertToNormalFormat(firstData, consultations));
@@ -351,7 +356,7 @@ namespace Aist
                 hashes.Hashes.Clear();
                 MainDelegateRefresh del = addConsultationButton_Click;
                 MainDelegateDelete mainDelegateDelete = deleteButton_Click;
-                List<List<string[]>> firstData = new List<List<string[]>>();
+                List<List<string[]>> firstData = new();
                 firstData.AddRange(firstFileData);
                 firstFileData.Clear();
                 firstFileData.AddRange(DataReader.ConvertToWeeklyFormat(firstData));
@@ -367,7 +372,7 @@ namespace Aist
 
         public static void RefreshConsultations(Consultation consultation, MainDelegateRefresh del, MainDelegateDelete mainDelegateDelete, FlowLayoutPanel scheduleFlowLayoutPanel)
         {
-            List<Consultation> consult = new List<Consultation>();
+            List<Consultation> consult = new();
             var items = ConsultationCardPanel.AddConsultationCardPanelInRefresher(cards, consultation, del, mainDelegateDelete, consultations, firstFileData);
             cards = items.Item1;
             foreach (var h in items.Item2.Hashes)
