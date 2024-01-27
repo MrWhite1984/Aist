@@ -114,6 +114,7 @@ namespace Aist.Panels
                     break;
             }
             timeLabel.TextAlign = ContentAlignment.TopCenter;
+            //
             // addPanel
             // 
             addPanel = new AddCardPanel("", 0, 0);

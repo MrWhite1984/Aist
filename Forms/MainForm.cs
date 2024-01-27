@@ -271,7 +271,6 @@ namespace Aist
                             saveForm,
                             days,
                             pathToNewFile,
-                            //FLPClear,
                             teacher,
                             saveFormats.Count(box => box.Checked)
                             );

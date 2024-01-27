@@ -12,7 +12,7 @@ namespace Aist
     class DataWriter
     {
         static Dictionary<int, string> times = new Dictionary<int, string>(){ { 0, "8.20-9.50" }, { 1, "10.00-11.30"}, { 2, "11.40-13.10" }, { 3, "13.45-15.15"}, { 4, "15.25-16.55" }, { 5, "17.05-18.30"}, { 6, "18.40-20.10" }, { 7, "20.20-21.50" } };
-        public static void WriteConsultationsToFile(string path, List<Consultation> consultations, Dictionary<int, string> days/*, MainDelegateClean mainDelegateClean*/)
+        public static void WriteConsultationsToFile(string path, List<Consultation> consultations, Dictionary<int, string> days)
         {
             consultations = DataByDays(consultations);
             Application word = new Application();
@@ -41,11 +41,9 @@ namespace Aist
                     table.Cell(i, f).Range.Borders[WdBorderType.wdBorderLeft].LineStyle = WdLineStyle.wdLineStyleSingle;
                 }
             }
-            doc.SaveAs(path + $@"\{consultations[0].Teacher}.doc");
+            doc.SaveAs2(path + $@"\{consultations[0].Teacher}.doc");
             doc.Close();
             word.Quit();
-            //mainDelegateClean();
-            //MessageBox.Show($"Сохранено в файл: {consultations[0].Teacher}.doc");
         }
         public static List<Consultation> DataByDays(List<Consultation> ungroupedData)
         {
@@ -131,7 +129,7 @@ namespace Aist
             return dataToReturn;
         }
 
-        public static void SavingDataInScheduleFormat(string path, List<Consultation> consultations, Dictionary<int, string> days/*, MainDelegateClean mainDelegateClean*/, List<List<string[]>> data)
+        public static void SavingDataInScheduleFormat(string path, List<Consultation> consultations, Dictionary<int, string> days, List<List<string[]>> data)
         {
             Application word = new Application();
             Document doc = word.Documents.Add();
@@ -597,11 +595,9 @@ namespace Aist
                     }
                 }
             }
-            doc.SaveAs(path + $@"\{consultations[0].Teacher} Расписание.doc");
+            doc.SaveAs2(path + $@"\{consultations[0].Teacher} Расписание.doc");
             doc.Close();
             word.Quit();
-            //mainDelegateClean();
-            //MessageBox.Show($"Сохранено в файл: {consultations[0].Teacher} Расписание.doc");
         }
     }
 }

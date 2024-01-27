@@ -28,7 +28,6 @@ namespace Aist
         static SaveForm SaveForm;
         static Dictionary<int, string> Days;
         static string PathToNewFile;
-        //MainDelegateClean FLPClear,
         static string Teacher;
         static int CheckedNum;
         static Settings settings;
@@ -113,7 +112,7 @@ namespace Aist
             }
             List<List<string[]>> temporaryListOfFirstFileData = new List<List<string[]>>();
             temporaryListOfFirstFileData.AddRange(FirstFileData);
-            DataWriter.SavingDataInScheduleFormat(PathToNewFile, temporaryListOfConsultations, temporaryDictionaryOfDays/*, FLPClear*/, temporaryListOfFirstFileData);
+            DataWriter.SavingDataInScheduleFormat(PathToNewFile, temporaryListOfConsultations, temporaryDictionaryOfDays, temporaryListOfFirstFileData);
             RemainingWorkCounter--;
             if (CheckedNum == 1)
             {
@@ -145,7 +144,7 @@ namespace Aist
             {
                 temporaryDictionaryOfDays.Add(Days.Keys.ToList()[i], Days.Values.ToList()[i]);
             }
-            DataWriter.WriteConsultationsToFile(PathToNewFile, temporaryListOfConsultations, temporaryDictionaryOfDays/*, FLPClear*/);
+            DataWriter.WriteConsultationsToFile(PathToNewFile, temporaryListOfConsultations, temporaryDictionaryOfDays);
             RemainingWorkCounter--;
             if (CheckedNum == 1)
             {
