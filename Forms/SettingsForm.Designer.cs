@@ -192,6 +192,7 @@ namespace Aist
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(890, 498);
             this.Controls.Add(this.settingsFlowLayoutPanel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "SettingsForm";
             this.ShowIcon = false;
             this.Text = "Настройки";
