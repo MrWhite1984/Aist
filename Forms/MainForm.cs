@@ -20,6 +20,8 @@ namespace Aist
     public partial class MainForm : Form
     {
         int consultationNum = 0;
+        //List<List<string[]>> data = new List<List<string[]>>();
+        List<string[]> dataFromFile = new List<string[]>();
         public MainForm()
         {
             InitializeComponent();
@@ -45,11 +47,11 @@ namespace Aist
             openFileDialog.Filter = "Microsoft Excel (*.xls*)|*.xls*|Текстовые файлы (*.txt*)|*.txt*";
             openFileDialog.ShowDialog();
             cards.Clear();
-            firstFileData.Clear();
+            dataForPrintingToScreen.Clear();
             MainDelegateRefresh del = addConsultationButton_Click;
             MainDelegateDelete mainDelegateDelete = deleteButton_Click;
             MainDelegateClean mainDelegateClean = FLPClear;
-            List<List<string[]>> data = new List<List<string[]>>();
+            
             Settings settings = Settings.ImportSettings();
             if (openFileDialog.FileName != "")
             {
@@ -67,15 +69,15 @@ namespace Aist
 
                     try
                     {
-                        data = DataReader.DataByDays(DataReader.ReadAllData(ws));
+                        dataFromFile = DataReader.ReadAllData(ws);
                         if (settings.Format == 0)
                         {
-                            firstFileData.AddRange(data);
+                            dataForPrintingToScreen.AddRange(DataReader.DataByDays(dataFromFile));
                         }
                         else
                         {
-                            data = DataReader.ConvertToWeeklyFormat(data);
-                            firstFileData.AddRange(data);
+                            List<string[]> dataCopy = dataFromFile;
+                            dataForPrintingToScreen.AddRange(DataReader.ConvertToWeeklyFormat(DataReader.DataByDays(dataCopy)));
                         }
                     }
                     catch (Exception ex)
@@ -94,16 +96,15 @@ namespace Aist
                     try
                     {
                         var items = DataReader.GetDataFromTxt(openFileDialog.FileName);
+                        dataFromFile = items.Item1;
                         if (settings.Format == 0)
-                        {
-                            data = items.Item1;
+                        {                            
+                            dataForPrintingToScreen.AddRange(DataReader.DataByDays(dataFromFile));
                         }
                         else
                         {
-                            data = DataReader.ConvertToWeeklyFormat(items.Item1);
-                        }
-
-                        firstFileData.AddRange(data);
+                            dataForPrintingToScreen.AddRange(DataReader.ConvertToWeeklyFormat(DataReader.DataByDays(dataFromFile)));
+                        }                        
                         teacher = items.Item2;
                         department = items.Item3;
                     }
@@ -113,7 +114,7 @@ namespace Aist
                     }
                 }
                 
-                FillOutsTheCards(firstFileData, teacher, del);
+                FillOutsTheCards(dataForPrintingToScreen, teacher, del);
                 scheduleFlowLayoutPanel.Controls.AddRange(cards.ToArray());
                 
             }
@@ -127,6 +128,7 @@ namespace Aist
             if (openFileDialog.FileName != "")
             {
                 path = openFileDialog.FileName;
+                List<string[]> newDataFromFile = new();
                 List<List<string[]>> newData = new List<List<string[]>>();
                 if (path.IndexOf(".xls") != -1)
                 {
@@ -137,8 +139,8 @@ namespace Aist
                     wb = excel.Workbooks.Open(path);
                     ws = wb.Worksheets[1];
 
-
-                    newData = DataReader.DataByDays(DataReader.ReadAllData(ws));
+                    newDataFromFile = DataReader.ReadAllData(ws);
+                    newData = DataReader.DataByDays(newDataFromFile);
 
 
 
@@ -148,14 +150,7 @@ namespace Aist
                 else
                 {
                     var items = DataReader.GetDataFromTxt(path);
-                    if (settings.Format == 0)
-                    {
-                        newData = items.Item1;
-                    }
-                    else
-                    {
-                        newData = DataReader.ConvertToWeeklyFormat(items.Item1);
-                    }
+                    newDataFromFile = items.Item1;
                     
                     if (items.Item2 != teacher)
                     {
@@ -166,19 +161,53 @@ namespace Aist
                 hashes.Hashes.Clear();
                 MainDelegateRefresh del = addConsultationButton_Click;
                 List<List<string[]>> firstData = new List<List<string[]>>();
-                firstData.AddRange(firstFileData);
+                firstData.AddRange(dataForPrintingToScreen);
                 List<List<string[]>> oldData = new List<List<string[]>>();
-                oldData.AddRange(firstFileData);
+                oldData.AddRange(dataForPrintingToScreen);
                 try
                 {
-                    firstFileData.Clear();
-                    firstFileData.AddRange(DataReader.MergeData(firstData, newData));
+                    dataForPrintingToScreen.Clear();
+                    if(!DataReader.DataComparison(dataFromFile, newDataFromFile))
+                    {
+                        dataFromFile.AddRange(newDataFromFile);
+                        if (settings.Format == 0)
+                        {
+                            dataForPrintingToScreen.AddRange(DataReader.DataByDays(dataFromFile));
+                        }
+                        else
+                        {
+                            List<string[]> dataCopy = dataFromFile;
+                            dataForPrintingToScreen.AddRange(DataReader.ConvertToWeeklyFormat(DataReader.DataByDays(dataCopy)));
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Выбраный файл уже добавлен");
+                        if (settings.Format == 0)
+                        {
+                            dataForPrintingToScreen.AddRange(DataReader.DataByDays(dataFromFile));
+                        }
+                        else
+                        {
+                            dataForPrintingToScreen.AddRange(DataReader.ConvertToWeeklyFormat(DataReader.DataByDays(dataFromFile)));
+                        }
+                    }
+                    
+                    //dataForPrintingToScreen.AddRange(DataReader.MergeData(data, newData));
                 }
                 catch
                 {
-                    firstFileData.AddRange(oldData);
+                    if (settings.Format == 0)
+                    {
+                        dataForPrintingToScreen.AddRange(DataReader.DataByDays(dataFromFile));
+                    }
+                    else
+                    {
+                        dataForPrintingToScreen.AddRange(DataReader.ConvertToWeeklyFormat(DataReader.DataByDays(dataFromFile)));
+                    }
+                    MessageBox.Show("Ошибеп добавления файла");
                 }
-                FillOutsTheCards(firstFileData, teacher, del);
+                FillOutsTheCards(dataForPrintingToScreen, teacher, del);
                 scheduleFlowLayoutPanel.Controls.Clear();
                 scheduleFlowLayoutPanel.Controls.AddRange(cards.ToArray());
                 foreach (var consultation in consultations)
@@ -189,6 +218,7 @@ namespace Aist
         }
         private static void FillOutsTheCards(List<List<string[]>> data, string teacher, MainDelegateRefresh del)
         {
+            cards.Clear();
             days = DataReader.GetDateByCode(data);
             for (int i = 0; i < data.Count; i++)
             {
@@ -246,7 +276,7 @@ namespace Aist
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            if (firstFileData.Count != 0)
+            if (dataForPrintingToScreen.Count != 0)
             {
                 SaveForm saveForm = new SaveForm();
                 saveForm.consultationsNum = consultations.Count;
@@ -259,7 +289,7 @@ namespace Aist
                 }
                 if (pathToNewFile != "" && pathToNewFile != null)
                 {
-                    if (firstFileData.Count != 0 && consultations.Count != 0 && saveForm.scheduleCheckBox.Checked)
+                    if (dataForPrintingToScreen.Count != 0 && consultations.Count != 0 && saveForm.scheduleCheckBox.Checked)
                     {
                         List<Consultation> temporaryListOfConsultations = new List<Consultation>();
                         temporaryListOfConsultations.AddRange(consultations);
@@ -269,7 +299,7 @@ namespace Aist
                             temporaryDictionaryOfDays.Add(days.Keys.ToList()[i], days.Values.ToList()[i]);
                         }
                         List<List<string[]>> temporaryListOfFirstFileData = new List<List<string[]>>();
-                        temporaryListOfFirstFileData.AddRange(firstFileData);
+                        temporaryListOfFirstFileData.AddRange(dataForPrintingToScreen);
                         DataWriter.SavingDataInScheduleFormat(pathToNewFile, temporaryListOfConsultations, temporaryDictionaryOfDays, FLPClear, temporaryListOfFirstFileData);
                     }
                     if (consultations.Count > 0)
@@ -329,10 +359,10 @@ namespace Aist
                     MainDelegateRefresh del = addConsultationButton_Click;
                     MainDelegateDelete mainDelegateDelete = deleteButton_Click;
                     List<List<string[]>> firstData = new List<List<string[]>>();
-                    firstData.AddRange(firstFileData);
-                    firstFileData.Clear();
-                    firstFileData.AddRange(DataReader.ConvertToWeeklyFormat(firstData));
-                    FillOutsTheCards(firstFileData, teacher, del);
+                    firstData.AddRange(dataForPrintingToScreen);
+                    dataForPrintingToScreen.Clear();
+                    dataForPrintingToScreen.AddRange(DataReader.ConvertToWeeklyFormat(firstData));
+                    FillOutsTheCards(dataForPrintingToScreen, teacher, del);
                     scheduleFlowLayoutPanel.Controls.Clear();
                     scheduleFlowLayoutPanel.Controls.AddRange(cards.ToArray());
                     foreach (var consultation in consultations)
@@ -347,10 +377,10 @@ namespace Aist
                     MainDelegateRefresh del = addConsultationButton_Click;
                     MainDelegateDelete mainDelegateDelete = deleteButton_Click;
                     List<List<string[]>> firstData = new List<List<string[]>>();
-                    firstData.AddRange(firstFileData);
-                    firstFileData.Clear();
-                    firstFileData.AddRange(DataReader.ConvertToNormalFormat(firstData, consultations));
-                    FillOutsTheCards(firstFileData, teacher, del);
+                    firstData.AddRange(dataForPrintingToScreen);
+                    dataForPrintingToScreen.Clear();
+                    dataForPrintingToScreen.AddRange(DataReader.ConvertToNormalFormat(firstData, consultations));
+                    FillOutsTheCards(dataForPrintingToScreen, teacher, del);
                     scheduleFlowLayoutPanel.Controls.Clear();
                     scheduleFlowLayoutPanel.Controls.AddRange(cards.ToArray());
                     foreach (var consultation in consultations)
@@ -366,10 +396,10 @@ namespace Aist
                 MainDelegateRefresh del = addConsultationButton_Click;
                 MainDelegateDelete mainDelegateDelete = deleteButton_Click;
                 List<List<string[]>> firstData = new List<List<string[]>>();
-                firstData.AddRange(firstFileData);
-                firstFileData.Clear();
-                firstFileData.AddRange(DataReader.ConvertToWeeklyFormat(firstData));
-                FillOutsTheCards(firstFileData, teacher, del);
+                firstData.AddRange(dataForPrintingToScreen);
+                dataForPrintingToScreen.Clear();
+                dataForPrintingToScreen.AddRange(DataReader.ConvertToWeeklyFormat(firstData));
+                FillOutsTheCards(dataForPrintingToScreen, teacher, del);
                 scheduleFlowLayoutPanel.Controls.Clear();
                 scheduleFlowLayoutPanel.Controls.AddRange(cards.ToArray());
                 foreach (var consultation in consultations)
@@ -382,7 +412,7 @@ namespace Aist
         public static void RefreshConsultations(Consultation consultation, MainDelegateRefresh del, MainDelegateDelete mainDelegateDelete, FlowLayoutPanel scheduleFlowLayoutPanel)
         {
             List<Consultation> consult = new List<Consultation>();
-            var items = ConsultationCardPanel.AddConsultationCardPanelInRefresher(cards, consultation, del, mainDelegateDelete, consultations, firstFileData);
+            var items = ConsultationCardPanel.AddConsultationCardPanelInRefresher(cards, consultation, del, mainDelegateDelete, consultations, dataForPrintingToScreen);
             cards = items.Item1;
             foreach (var h in items.Item2.Hashes)
             {

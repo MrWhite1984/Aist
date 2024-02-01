@@ -36,45 +36,23 @@ namespace Aist
         public static List<List<string[]>> DataByDays(List<string[]> ungroupedData)
         {
             List<List<string[]>> data = new List<List<string[]>>();
-            List<string[]> partOfData = new List<string[]>();
-            for (int i = 0; i < ungroupedData.Count; i++)
+            List<string> datesInStringFormat = new();
+            List<DateTime> dates = new();
+            foreach(var item in ungroupedData)
             {
-                if (ungroupedData.Count != i+1)
+                if (!dates.Contains(Convert.ToDateTime(item[2]+ "." + DateTime.Now.Year.ToString())))
                 {
-                    if (ungroupedData[i][2] != ungroupedData[i + 1][2])
-                    {
-                        partOfData.Add(ungroupedData[i]);
-                        data.Add(partOfData);
-                        partOfData = new List<string[]>();
-                    }
-                    else
-                    {
-                        partOfData.Add(ungroupedData[i]);
-                    }
-
-                }
-                else if (ungroupedData.Count != 1)
-                {
-                    if (ungroupedData[i][2] != ungroupedData[i - 1][2])
-                    {
-                        partOfData.Add(ungroupedData[i]);
-                        data.Add(partOfData);
-                        partOfData = new List<string[]>();
-                    }
-                    else
-                    {
-                        partOfData.Add(ungroupedData[i]);
-                    }
-                }
-                else
-                {
-                    partOfData.Add(ungroupedData[0]);
-                    data.Add(partOfData);
-                    partOfData = new List<string[]>();
+                    dates.Add(Convert.ToDateTime(item[2] + "." + DateTime.Now.Year.ToString()));
                 }
             }
-            if (partOfData.Count != 0)
+            dates.Sort();
+            foreach(var item in dates)
             {
+                datesInStringFormat.Add(item.ToString("dd/MM/yyyy").Remove(5));
+            }
+            foreach(var dateItem in datesInStringFormat)
+            {
+                List<string[]> partOfData = ungroupedData.FindAll(item => item[2] == dateItem);
                 data.Add(partOfData);
             }
             return data;
@@ -89,7 +67,7 @@ namespace Aist
             return date;
         }
 
-        public static (List<List<string[]>>, string, string) GetDataFromTxt(string filePath)
+        public static (List<string[]>, string, string) GetDataFromTxt(string filePath)
         {
             List<string[]> data = new List<string[]>();
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
@@ -156,7 +134,7 @@ namespace Aist
                     data.Add(s);
                 }
             }
-            return (DataByDays(data), teacher, department);
+            return (data, teacher, department);
         }
 
         //public static List<List<string[]>> MergeData(List<List<string[]>> data1, List<List<string[]>> data2)
@@ -279,37 +257,43 @@ namespace Aist
             {
                 Dictionary<int, string[]> subjects = new Dictionary<int, string[]>();
                 List<string[]> day = new List<string[]>();
-                foreach (var partOfData2 in partOfData)
+                try
                 {
-                    switch (partOfData2[4])
+                    foreach (var partOfData2 in partOfData)
                     {
-                        case "08.20-09.50 ":
-                            subjects.Add(1, partOfData2);
-                            break;
-                        case "10.00-11.30 ":
-                            subjects.Add(2, partOfData2);
-                            break;
-                        case "11.40-13.10 ":
-                            subjects.Add(3, partOfData2);
-                            break;
-                        case "13.45-15.15 ":
-                            subjects.Add(4, partOfData2);
-                            break;
-                        case "15.25-16.55 ":
-                            subjects.Add(5, partOfData2);
-                            break;
-                        case "17.05-18.35 ":
-                            subjects.Add(6, partOfData2);
-                            break;
-                        case "18.40-20.10 ":
-                            subjects.Add(7, partOfData2);
-                            break;
-                        case "20.20-21.50 ":
-                            subjects.Add(8, partOfData2);
-                            break;
-                        default:
-                            break;
+                        switch (partOfData2[4])
+                        {
+                            case "08.20-09.50 ":
+                                subjects.Add(1, partOfData2);
+                                break;
+                            case "10.00-11.30 ":
+                                subjects.Add(2, partOfData2);
+                                break;
+                            case "11.40-13.10 ":
+                                subjects.Add(3, partOfData2);
+                                break;
+                            case "13.45-15.15 ":
+                                subjects.Add(4, partOfData2);
+                                break;
+                            case "15.25-16.55 ":
+                                subjects.Add(5, partOfData2);
+                                break;
+                            case "17.05-18.35 ":
+                                subjects.Add(6, partOfData2);
+                                break;
+                            case "18.40-20.10 ":
+                                subjects.Add(7, partOfData2);
+                                break;
+                            case "20.20-21.50 ":
+                                subjects.Add(8, partOfData2);
+                                break;
+                            default:
+                                break;
+                        }
                     }
+                }
+                catch(Exception ex) { 
+                MessageBox.Show(ex.Message);
                 }
                 var keys = subjects.Keys.ToList();
                 keys.Sort();
@@ -319,6 +303,7 @@ namespace Aist
                 }
                 dataForReturn.Add(day);
             }
+            MessageBox.Show("");
             return dataForReturn;
         }
 
@@ -564,6 +549,18 @@ namespace Aist
                     data.Remove(partOfData);
             }
             return data;
+        }
+
+        public static bool DataComparison(List<string[]> data1, List<string[]> data2)
+        {
+            if (data1.Count != data2.Count)
+                return false;
+            foreach(var item in data1)
+            {
+                if (!data2.Any(data2Item=> data2Item[2] == item[2] && data2Item[4] == item[4]))
+                    return false;
+            }
+            return true;
         }
     }
 }
