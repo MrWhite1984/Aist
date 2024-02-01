@@ -38,45 +38,23 @@ namespace Aist
         public static List<List<string[]>> DataByDays(List<string[]> ungroupedData)
         {
             List<List<string[]>> data = new();
-            List<string[]> partOfData = new();
-            for (int i = 0; i < ungroupedData.Count; i++)
+            List<string> datesInStringFormat = new();
+            List<DateTime> dates = new();
+            foreach (var item in ungroupedData)
             {
-                if (ungroupedData.Count != i+1)
+                if (!dates.Contains(Convert.ToDateTime(item[2] + "." + DateTime.Now.Year.ToString())))
                 {
-                    if (ungroupedData[i][2] != ungroupedData[i + 1][2])
-                    {
-                        partOfData.Add(ungroupedData[i]);
-                        data.Add(partOfData);
-                        partOfData = new();
-                    }
-                    else
-                    {
-                        partOfData.Add(ungroupedData[i]);
-                    }
-
-                }
-                else if (ungroupedData.Count != 1)
-                {
-                    if (ungroupedData[i][2] != ungroupedData[i - 1][2])
-                    {
-                        partOfData.Add(ungroupedData[i]);
-                        data.Add(partOfData);
-                        partOfData = new List<string[]>();
-                    }
-                    else
-                    {
-                        partOfData.Add(ungroupedData[i]);
-                    }
-                }
-                else
-                {
-                    partOfData.Add(ungroupedData[0]);
-                    data.Add(partOfData);
-                    partOfData = new List<string[]>();
+                    dates.Add(Convert.ToDateTime(item[2] + "." + DateTime.Now.Year.ToString()));
                 }
             }
-            if (partOfData.Count != 0)
+            dates.Sort();
+            foreach (var item in dates)
             {
+                datesInStringFormat.Add(item.ToString("dd/MM/yyyy").Remove(5));
+            }
+            foreach (var dateItem in datesInStringFormat)
+            {
+                List<string[]> partOfData = ungroupedData.FindAll(item => item[2] == dateItem);
                 data.Add(partOfData);
             }
             return data;
@@ -91,7 +69,7 @@ namespace Aist
             return date;
         }
 
-        public static (List<List<string[]>>, string, string) GetDataFromTxt(string filePath)
+        public static (List<string[]>, string, string) GetDataFromTxt(string filePath)
         {
             List<string[]> data = new();
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
@@ -158,96 +136,96 @@ namespace Aist
                     data.Add(s);
                 }
             }
-            return (DataByDays(data), teacher, department);
+            return (data, teacher, department);
         }
 
-        public static List<List<string[]>> MergeData(List<List<string[]>> data1, List<List<string[]>> data2)
-        {
-            List<List<string[]>> ungroupedDataInDayFormat = new();
-            List<List<string[]>> dataForReturn = new();
-            List<string[]> ungroupedData = new();
-            List<string[]> dataToByDays = new();
-            List<List<string[]>> data = new();
-            ungroupedDataInDayFormat.AddRange(data1);
-            ungroupedDataInDayFormat.AddRange(data2);
-            List<DateTime> date = new();
-            foreach (var item in ungroupedDataInDayFormat)
-            {
-                foreach(var partOfItem in item)
-                {
-                    ungroupedData.Add(partOfItem);
-                }
-            }
-            foreach (var partOfData in ungroupedData)
-            {
-                if (!date.Contains(Convert.ToDateTime(partOfData[2] + "." + DateTime.Now.Year.ToString())))
-                {
-                    date.Add(Convert.ToDateTime(partOfData[2] + "." + DateTime.Now.Year.ToString()));
-                }
-                date.Sort();
-            }
-            List<string> dateString = new();
-            foreach (var oneDate in date)
-            {
-                dateString.Add(oneDate.ToString("dd/MM/yyyy").Remove(5));
-            }
-            foreach (var oneDate in dateString)
-            {
-                foreach (var partOfData in ungroupedData)
-                {
-                    if (oneDate.Equals(partOfData[2]))
-                    {
-                        dataToByDays.Add(partOfData);
-                    }
-                }
-            }
-            data = DataByDays(dataToByDays);
-            foreach (var partOfData in data)
-            {
-                Dictionary<int, string[]> subjects = new();
-                List<string[]> day = new();
-                foreach (var partOfData2 in partOfData)
-                {
-                    switch (partOfData2[4])
-                    {
-                        case "08.20-09.50 ":
-                            subjects.Add(1, partOfData2);
-                            break;
-                        case "10.00-11.30 ":
-                            subjects.Add(2, partOfData2);
-                            break;
-                        case "11.40-13.10 ":
-                            subjects.Add(3, partOfData2);
-                            break;
-                        case "13.45-15.15 ":
-                            subjects.Add(4, partOfData2);
-                            break;
-                        case "15.25-16.55 ":
-                            subjects.Add(5, partOfData2);
-                            break;
-                        case "17.05-18.35 ":
-                            subjects.Add(6, partOfData2);
-                            break;
-                        case "18.40-20.10 ":
-                            subjects.Add(7, partOfData2);
-                            break;
-                        case "20.20-21.50 ":
-                            subjects.Add(8, partOfData2);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                var keys = subjects.Keys.ToList();
-                keys.Sort();
-                foreach (var subject in keys)
-                {
-                    day.Add(subjects[subject]);
-                }
-                dataForReturn.Add(day);
-            }
-            return dataForReturn;
-        }
+        //public static List<List<string[]>> MergeData(List<List<string[]>> data1, List<List<string[]>> data2)
+        //{
+        //    List<List<string[]>> ungroupedDataInDayFormat = new();
+        //    List<List<string[]>> dataForReturn = new();
+        //    List<string[]> ungroupedData = new();
+        //    List<string[]> dataToByDays = new();
+        //    List<List<string[]>> data = new();
+        //    ungroupedDataInDayFormat.AddRange(data1);
+        //    ungroupedDataInDayFormat.AddRange(data2);
+        //    List<DateTime> date = new();
+        //    foreach (var item in ungroupedDataInDayFormat)
+        //    {
+        //        foreach(var partOfItem in item)
+        //        {
+        //            ungroupedData.Add(partOfItem);
+        //        }
+        //    }
+        //    foreach (var partOfData in ungroupedData)
+        //    {
+        //        if (!date.Contains(Convert.ToDateTime(partOfData[2] + "." + DateTime.Now.Year.ToString())))
+        //        {
+        //            date.Add(Convert.ToDateTime(partOfData[2] + "." + DateTime.Now.Year.ToString()));
+        //        }
+        //        date.Sort();
+        //    }
+        //    List<string> dateString = new();
+        //    foreach (var oneDate in date)
+        //    {
+        //        dateString.Add(oneDate.ToString("dd/MM/yyyy").Remove(5));
+        //    }
+        //    foreach (var oneDate in dateString)
+        //    {
+        //        foreach (var partOfData in ungroupedData)
+        //        {
+        //            if (oneDate.Equals(partOfData[2]))
+        //            {
+        //                dataToByDays.Add(partOfData);
+        //            }
+        //        }
+        //    }
+        //    data = DataByDays(dataToByDays);
+        //    foreach (var partOfData in data)
+        //    {
+        //        Dictionary<int, string[]> subjects = new();
+        //        List<string[]> day = new();
+        //        foreach (var partOfData2 in partOfData)
+        //        {
+        //            switch (partOfData2[4])
+        //            {
+        //                case "08.20-09.50 ":
+        //                    subjects.Add(1, partOfData2);
+        //                    break;
+        //                case "10.00-11.30 ":
+        //                    subjects.Add(2, partOfData2);
+        //                    break;
+        //                case "11.40-13.10 ":
+        //                    subjects.Add(3, partOfData2);
+        //                    break;
+        //                case "13.45-15.15 ":
+        //                    subjects.Add(4, partOfData2);
+        //                    break;
+        //                case "15.25-16.55 ":
+        //                    subjects.Add(5, partOfData2);
+        //                    break;
+        //                case "17.05-18.35 ":
+        //                    subjects.Add(6, partOfData2);
+        //                    break;
+        //                case "18.40-20.10 ":
+        //                    subjects.Add(7, partOfData2);
+        //                    break;
+        //                case "20.20-21.50 ":
+        //                    subjects.Add(8, partOfData2);
+        //                    break;
+        //                default:
+        //                    break;
+        //            }
+        //        }
+        //        var keys = subjects.Keys.ToList();
+        //        keys.Sort();
+        //        foreach (var subject in keys)
+        //        {
+        //            day.Add(subjects[subject]);
+        //        }
+        //        dataForReturn.Add(day);
+        //    }
+        //    return dataForReturn;
+        //}
 
         public static List<List<string[]>> ConvertToWeeklyFormat(List<List<string[]>> data)
         {
@@ -505,5 +483,18 @@ namespace Aist
             }
             return data;
         }
+        public static bool DataComparison(List<string[]> data1, List<string[]> data2)
+        {
+            if (data1.Count != data2.Count)
+                return false;
+            foreach (var item in data1)
+            {
+                if (!data2.Any(data2Item => data2Item[2] == item[2] && data2Item[4] == item[4]))
+                    return false;
+            }
+            return true;
+        }
     }
+
+    
 }

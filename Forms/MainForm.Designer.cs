@@ -17,7 +17,7 @@ namespace Aist
         public static HashTable hashes = new HashTable();
         public static List<DayCardPanel> cards = new List<DayCardPanel>();
         public static List<Consultation> consultations = new List<Consultation>();
-        public static List<List<string[]>> firstFileData = new List<List<string[]>>();
+        public static List<List<string[]>> dataForPrintingToScreen = new List<List<string[]>>();
 
         /// <summary>
         /// Clean up any resources being used.
