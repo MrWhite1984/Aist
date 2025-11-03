@@ -30,3 +30,6 @@ GUI - <em>WinForms</em><br>
 <image src="git_img/UI3.png">
 Настройки
 <image src="git_img/UI4.png">
+
+<h2>"Спектр" диаграмма системы</h2>
+<image src="git_img/diagram.png">
